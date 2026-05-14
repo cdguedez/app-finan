@@ -1,20 +1,46 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import LoginScreen from "./src/screens/Auth/LoginScreen";
+import RegisterScreen from "./src/screens/Auth/RegisterScreen";
+import HomeScreen from "./src/screens/HomeScreen";
+import CategoryManagementScreen from "./src/screens/Finance/CategoryManagementScreen";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [user, setUser] = useState<any>(null);
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!user ? (
+          <>
+            <Stack.Screen name="Login">
+              {(props) => <LoginScreen {...props} setUser={setUser} />}
+            </Stack.Screen>
+            <Stack.Screen name="Register">
+              {(props) => <RegisterScreen {...props} setUser={setUser} />}
+            </Stack.Screen>
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Home">
+              {(props) => (
+                <HomeScreen {...props} user={user} onLogout={handleLogout} />
+              )}
+            </Stack.Screen>
+            <Stack.Screen
+              name="CategoryManagement"
+              component={CategoryManagementScreen}
+            />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
