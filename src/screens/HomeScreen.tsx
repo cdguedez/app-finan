@@ -120,7 +120,7 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
             <View style={StylesHomeScreen.headerLeft}>
               <Text style={StylesHomeScreen.welcomeText}>Panel Financiero</Text>
               <Text style={StylesHomeScreen.userNameText}>
-                Hola, {user?.email.split("@")[0]}
+                Hola, {`${user?.user?.firstName} ${user?.user?.lastName}`}
               </Text>
             </View>
             <TouchableOpacity

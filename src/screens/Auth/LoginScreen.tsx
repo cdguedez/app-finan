@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { authService } from "../../services/authService";
 import {
   Text,
   View,
@@ -18,9 +19,12 @@ import { StylesLoginScreen } from "./styles/LoginScreen.styles";
 const { width } = Dimensions.get("window");
 
 const LoginScreen = ({ navigation, setUser }: any) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+  });
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
     (async () => {
@@ -35,7 +39,7 @@ const LoginScreen = ({ navigation, setUser }: any) => {
       if (!savedBiometrics) {
         return Alert.alert(
           "Biometría no encontrada",
-          "Por favor, asegúrate de tener configurada la biometría en tu dispositivo."
+          "Por favor, asegúrate de tener configurada la biometría en tu dispositivo.",
         );
       }
 
@@ -45,19 +49,53 @@ const LoginScreen = ({ navigation, setUser }: any) => {
       });
 
       if (result.success) {
-        // En una aplicación real, se usaría un token seguro
-        setUser({ email: "usuario@biometrico.com" });
+        setIsLoading(true);
+        try {
+          // Aquí deberías leer el biometricToken guardado (ej: expo-secure-store)
+          // const biometricToken = await SecureStore.getItemAsync('biometricToken');
+          // const { accessToken, user } = await authService.biometricLogin({ biometricToken });
+          // setUser({ email: user.email, accessToken });
+          Alert.alert(
+            "Biometría OK",
+            "Conecta con authService.biometricLogin() una vez tengas el token guardado.",
+          );
+        } catch (err: any) {
+          Alert.alert(
+            "Error de biometría",
+            err?.message ?? "No se pudo iniciar sesión",
+          );
+        } finally {
+          setIsLoading(false);
+        }
       }
     } catch (error) {
       Alert.alert("Error", "Ocurrió un error durante la autenticación");
     }
   };
 
-  const handleLogin = () => {
-    if (email && password) {
-      setUser({ email });
-    } else {
-      alert("Por favor, ingresa tus credenciales");
+  const handleLogin = async () => {
+    if (!credentials.email || !credentials.password) {
+      Alert.alert(
+        "Campos requeridos",
+        "Por favor, ingresa tu correo y contraseña.",
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { accessToken, user } = await authService.login({
+        email: credentials.email,
+        password: credentials.password,
+      });
+      setUser({ user, accessToken });
+    } catch (err: any) {
+      Alert.alert(
+        "Error al iniciar sesión",
+        err?.message ?? "Verifica tus credenciales e intenta de nuevo.",
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,8 +125,10 @@ const LoginScreen = ({ navigation, setUser }: any) => {
               style={StylesLoginScreen.input}
               placeholder="tu@email.com"
               placeholderTextColor="#94a3b8"
-              value={email}
-              onChangeText={setEmail}
+              value={credentials.email}
+              onChangeText={(email) =>
+                setCredentials({ ...credentials, email })
+              }
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -100,15 +140,18 @@ const LoginScreen = ({ navigation, setUser }: any) => {
               style={StylesLoginScreen.input}
               placeholder="••••••••"
               placeholderTextColor="#94a3b8"
-              value={password}
-              onChangeText={setPassword}
+              value={credentials.password}
+              onChangeText={(password) =>
+                setCredentials({ ...credentials, password })
+              }
               secureTextEntry={true}
             />
           </View>
 
           <TouchableOpacity
-            style={StylesLoginScreen.button}
+            style={[StylesLoginScreen.button, isLoading && { opacity: 0.6 }]}
             onPress={handleLogin}
+            disabled={isLoading}
           >
             <LinearGradient
               colors={["#4facfe", "#00f2fe"]}
@@ -116,7 +159,9 @@ const LoginScreen = ({ navigation, setUser }: any) => {
               end={{ x: 1, y: 0 }}
               style={StylesLoginScreen.buttonGradient}
             >
-              <Text style={StylesLoginScreen.buttonText}>Iniciar Sesión</Text>
+              <Text style={StylesLoginScreen.buttonText}>
+                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 

@@ -10,6 +10,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [user, setUser] = useState<any>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   const handleLogout = () => {
     setUser(null);

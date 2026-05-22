@@ -60,6 +60,38 @@ const mockDashboardData: DashboardData = {
       icon: "fitness",
       color: "#3B82F6",
     },
+    {
+      id: 5,
+      name: "Uber",
+      category: "Transporte",
+      amount: "-$15.00",
+      icon: "car",
+      color: "#3B82F6",
+    },
+    {
+      id: 6,
+      name: "Spotify",
+      category: "Entretenimiento",
+      amount: "-$10.00",
+      icon: "musical-note",
+      color: "#EF4444",
+    },
+    {
+      id: 7,
+      name: "Uber",
+      category: "Transporte",
+      amount: "-$15.00",
+      icon: "car",
+      color: "#3B82F6",
+    },
+    {
+      id: 8,
+      name: "Spotify",
+      category: "Entretenimiento",
+      amount: "-$10.00",
+      icon: "musical-note",
+      color: "#EF4444",
+    },
   ],
 };
 
