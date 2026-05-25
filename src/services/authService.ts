@@ -3,7 +3,8 @@ import { apiRequest } from "./apiClient";
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
 export interface RegisterPayload {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }

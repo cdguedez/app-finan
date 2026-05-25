@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useRef } from "react";
 import {
   Text,
   View,
@@ -11,19 +11,16 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { StylesRegisterScreen } from "./styles/RegisterScreen.styles";
+import { useRegister } from "../../hooks/auth/useRegister";
 
 const RegisterScreen = ({ navigation, setUser }: any) => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { register, onChangeRegister, handleRegister } = useRegister({
+    setUser,
+  });
 
-  const handleRegister = () => {
-    if (name && email && password) {
-      setUser({ email, name });
-    } else {
-      alert("Por favor, completa todos los campos");
-    }
-  };
+  const lastNameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
 
   return (
     <View style={StylesRegisterScreen.container}>
@@ -50,38 +47,62 @@ const RegisterScreen = ({ navigation, setUser }: any) => {
 
           <View style={StylesRegisterScreen.form}>
             <View style={StylesRegisterScreen.inputContainer}>
-              <Text style={StylesRegisterScreen.label}>Nombre Completo</Text>
+              <Text style={StylesRegisterScreen.label}>Nombre</Text>
               <TextInput
                 style={StylesRegisterScreen.input}
                 placeholder="Juan Pérez"
                 placeholderTextColor="#94a3b8"
-                value={name}
-                onChangeText={setName}
+                value={register.firstName}
+                onChangeText={(text) => onChangeRegister("firstName", text)}
+                returnKeyType="next"
+                onSubmitEditing={() => lastNameRef.current?.focus()}
+                blurOnSubmit={false}
+              />
+            </View>
+            <View style={StylesRegisterScreen.inputContainer}>
+              <Text style={StylesRegisterScreen.label}>Apellido</Text>
+              <TextInput
+                ref={lastNameRef}
+                style={StylesRegisterScreen.input}
+                placeholder="Juan Pérez"
+                placeholderTextColor="#94a3b8"
+                value={register.lastName}
+                onChangeText={(text) => onChangeRegister("lastName", text)}
+                returnKeyType="next"
+                onSubmitEditing={() => emailRef.current?.focus()}
+                blurOnSubmit={false}
               />
             </View>
 
             <View style={StylesRegisterScreen.inputContainer}>
               <Text style={StylesRegisterScreen.label}>Correo Electrónico</Text>
               <TextInput
+                ref={emailRef}
                 style={StylesRegisterScreen.input}
                 placeholder="tu@email.com"
                 placeholderTextColor="#94a3b8"
-                value={email}
-                onChangeText={setEmail}
+                value={register.email}
+                onChangeText={(text) => onChangeRegister("email", text)}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                blurOnSubmit={false}
               />
             </View>
 
             <View style={StylesRegisterScreen.inputContainer}>
               <Text style={StylesRegisterScreen.label}>Contraseña</Text>
               <TextInput
+                ref={passwordRef}
                 style={StylesRegisterScreen.input}
                 placeholder="••••••••"
                 placeholderTextColor="#94a3b8"
-                value={password}
-                onChangeText={setPassword}
+                value={register.password}
+                onChangeText={(text) => onChangeRegister("password", text)}
                 secureTextEntry={true}
+                returnKeyType="done"
+                onSubmitEditing={handleRegister}
               />
             </View>
 
