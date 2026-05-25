@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-import { authService } from "../../services/authService";
 import {
   Text,
   View,
@@ -8,96 +6,24 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
-  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
-import * as LocalAuthentication from "expo-local-authentication";
 import { Ionicons } from "@expo/vector-icons";
 import { StylesLoginScreen } from "./styles/LoginScreen.styles";
+import { useLogin } from "../../hooks/auth/useLogin";
 
 const { width } = Dimensions.get("window");
 
 const LoginScreen = ({ navigation, setUser }: any) => {
-  const [credentials, setCredentials] = useState({
-    email: "",
-    password: "",
-  });
-  const [isBiometricSupported, setIsBiometricSupported] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  React.useEffect(() => {
-    (async () => {
-      const compatible = await LocalAuthentication.hasHardwareAsync();
-      setIsBiometricSupported(compatible);
-    })();
-  }, []);
-
-  const handleBiometricAuth = async () => {
-    try {
-      const savedBiometrics = await LocalAuthentication.isEnrolledAsync();
-      if (!savedBiometrics) {
-        return Alert.alert(
-          "Biometría no encontrada",
-          "Por favor, asegúrate de tener configurada la biometría en tu dispositivo.",
-        );
-      }
-
-      const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Inicia sesión con biometría",
-        fallbackLabel: "Usar contraseña",
-      });
-
-      if (result.success) {
-        setIsLoading(true);
-        try {
-          // Aquí deberías leer el biometricToken guardado (ej: expo-secure-store)
-          // const biometricToken = await SecureStore.getItemAsync('biometricToken');
-          // const { accessToken, user } = await authService.biometricLogin({ biometricToken });
-          // setUser({ email: user.email, accessToken });
-          Alert.alert(
-            "Biometría OK",
-            "Conecta con authService.biometricLogin() una vez tengas el token guardado.",
-          );
-        } catch (err: any) {
-          Alert.alert(
-            "Error de biometría",
-            err?.message ?? "No se pudo iniciar sesión",
-          );
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      Alert.alert("Error", "Ocurrió un error durante la autenticación");
-    }
-  };
-
-  const handleLogin = async () => {
-    if (!credentials.email || !credentials.password) {
-      Alert.alert(
-        "Campos requeridos",
-        "Por favor, ingresa tu correo y contraseña.",
-      );
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { accessToken, user } = await authService.login({
-        email: credentials.email,
-        password: credentials.password,
-      });
-      setUser({ user, accessToken });
-    } catch (err: any) {
-      Alert.alert(
-        "Error al iniciar sesión",
-        err?.message ?? "Verifica tus credenciales e intenta de nuevo.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    handleBiometricAuth,
+    handleLogin,
+    setCredentials,
+    credentials,
+    isBiometricSupported,
+    isLoading,
+  } = useLogin({ setUser });
 
   return (
     <View style={StylesLoginScreen.container}>

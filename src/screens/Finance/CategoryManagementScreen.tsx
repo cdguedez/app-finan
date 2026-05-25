@@ -14,18 +14,35 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { StylesCategoryManagement } from "./styles/CategoryManagement.styles";
 import { financeService, Category } from "../../services/financeService";
-import Skeleton from "../../components/Skeleton";
+import Skeleton from "../../components/Skeleton/Skeleton";
 
 const COLORS = [
-  "#3B82F6", "#10B981", "#EF4444", "#F59E0B", 
-  "#8B5CF6", "#EC4899", "#06B6D4", "#F97316"
+  "#3B82F6",
+  "#10B981",
+  "#EF4444",
+  "#F59E0B",
+  "#8B5CF6",
+  "#EC4899",
+  "#06B6D4",
+  "#F97316",
+  "#5c1f98",
+  "#700b00",
+  "#007038",
 ];
 
 const CategorySkeleton = () => (
   <View>
     {[1, 2, 3, 4, 5].map((i) => (
-      <View key={i} style={[StylesCategoryManagement.categoryItem, { opacity: 0.5 }]}>
-        <Skeleton width={16} height={16} borderRadius={8} style={{ marginRight: 15 }} />
+      <View
+        key={i}
+        style={[StylesCategoryManagement.categoryItem, { opacity: 0.5 }]}
+      >
+        <Skeleton
+          width={16}
+          height={16}
+          borderRadius={8}
+          style={{ marginRight: 15 }}
+        />
         <Skeleton width="50%" height={16} borderRadius={4} />
       </View>
     ))}
@@ -57,16 +74,19 @@ const CategoryManagementScreen = ({ navigation }: any) => {
 
   const handleAddCategory = async () => {
     if (!name.trim()) {
-      return Alert.alert("Error", "Por favor ingresa un nombre para la categoría");
+      return Alert.alert(
+        "Error",
+        "Por favor ingresa un nombre para la categoría",
+      );
     }
-    
+
     setIsAdding(true);
     try {
       const newCat = await financeService.addCategory({
         name: name.trim(),
         color: selectedColor,
       });
-      
+
       setCategories([newCat, ...categories]);
       setName("");
       Alert.alert("Éxito", "Categoría agregada correctamente");
@@ -78,17 +98,17 @@ const CategoryManagementScreen = ({ navigation }: any) => {
   };
 
   const handleDeleteCategory = (id: string) => {
-    setCategories(categories.filter(cat => cat.id !== id));
+    setCategories(categories.filter((cat) => cat.id !== id));
   };
 
   return (
     <View style={StylesCategoryManagement.container}>
       <StatusBar style="light" />
-      
+
       <SafeAreaView style={StylesCategoryManagement.content}>
         {/* Header */}
         <View style={StylesCategoryManagement.header}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={StylesCategoryManagement.backButton}
             onPress={() => navigation.goBack()}
           >
@@ -101,7 +121,9 @@ const CategoryManagementScreen = ({ navigation }: any) => {
           {/* Add Category Form */}
           <View style={StylesCategoryManagement.formContainer}>
             <View style={StylesCategoryManagement.inputGroup}>
-              <Text style={StylesCategoryManagement.label}>Nombre de la Categoría</Text>
+              <Text style={StylesCategoryManagement.label}>
+                Nombre de la Categoría
+              </Text>
               <TextInput
                 style={StylesCategoryManagement.input}
                 placeholder="Ej. Viajes, Regalos..."
@@ -113,7 +135,9 @@ const CategoryManagementScreen = ({ navigation }: any) => {
             </View>
 
             <View style={StylesCategoryManagement.inputGroup}>
-              <Text style={StylesCategoryManagement.label}>Selecciona un Color</Text>
+              <Text style={StylesCategoryManagement.label}>
+                Selecciona un Color
+              </Text>
               <View style={StylesCategoryManagement.colorGrid}>
                 {COLORS.map((color) => (
                   <TouchableOpacity
@@ -121,7 +145,8 @@ const CategoryManagementScreen = ({ navigation }: any) => {
                     style={[
                       StylesCategoryManagement.colorOption,
                       { backgroundColor: color },
-                      selectedColor === color && StylesCategoryManagement.selectedColor
+                      selectedColor === color &&
+                        StylesCategoryManagement.selectedColor,
                     ]}
                     onPress={() => setSelectedColor(color)}
                     disabled={isAdding}
@@ -134,8 +159,11 @@ const CategoryManagementScreen = ({ navigation }: any) => {
               </View>
             </View>
 
-            <TouchableOpacity 
-              style={[StylesCategoryManagement.addButton, isAdding && { opacity: 0.7 }]}
+            <TouchableOpacity
+              style={[
+                StylesCategoryManagement.addButton,
+                isAdding && { opacity: 0.7 },
+              ]}
               onPress={handleAddCategory}
               disabled={isAdding}
             >
@@ -146,7 +174,9 @@ const CategoryManagementScreen = ({ navigation }: any) => {
                 {isAdding ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text style={StylesCategoryManagement.addButtonText}>Agregar Categoría</Text>
+                  <Text style={StylesCategoryManagement.addButtonText}>
+                    Agregar Categoría
+                  </Text>
                 )}
               </LinearGradient>
             </TouchableOpacity>
@@ -159,9 +189,16 @@ const CategoryManagementScreen = ({ navigation }: any) => {
           ) : (
             categories.map((item) => (
               <View key={item.id} style={StylesCategoryManagement.categoryItem}>
-                <View style={[StylesCategoryManagement.categoryColorDot, { backgroundColor: item.color }]} />
-                <Text style={StylesCategoryManagement.categoryName}>{item.name}</Text>
-                <TouchableOpacity 
+                <View
+                  style={[
+                    StylesCategoryManagement.categoryColorDot,
+                    { backgroundColor: item.color },
+                  ]}
+                />
+                <Text style={StylesCategoryManagement.categoryName}>
+                  {item.name}
+                </Text>
+                <TouchableOpacity
                   style={StylesCategoryManagement.deleteButton}
                   onPress={() => handleDeleteCategory(item.id)}
                 >
