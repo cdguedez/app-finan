@@ -5,8 +5,17 @@ import * as SecureStore from "expo-secure-store";
 import { ActivityIndicator, View } from "react-native";
 import LoginScreen from "./src/screens/Auth/LoginScreen";
 import RegisterScreen from "./src/screens/Auth/RegisterScreen";
+<<<<<<< Updated upstream
 import HomeScreen from "./src/screens/HomeScreen";
 import CategoryManagementScreen from "./src/screens/Finance/CategoryManagementScreen";
+=======
+import RegisterAccountScreen from "./src/screens/Finance/RegisterAccountScreen";
+import MainTabNavigator from "./src/navigation/MainTabNavigator";
+import {
+  SecureStoreProvider,
+  useSecureStore,
+} from "./src/context/SecureStoreContext";
+>>>>>>> Stashed changes
 
 const Stack = createNativeStackNavigator();
 
@@ -74,14 +83,18 @@ export default function App() {
           </>
         ) : (
           <>
+<<<<<<< Updated upstream
             <Stack.Screen name="Home">
               {(props) => (
                 <HomeScreen {...props} user={user} onLogout={handleLogout} />
               )}
             </Stack.Screen>
+=======
+            <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+>>>>>>> Stashed changes
             <Stack.Screen
-              name="CategoryManagement"
-              component={CategoryManagementScreen}
+              name="RegisterAccount"
+              component={RegisterAccountScreen}
             />
           </>
         )}

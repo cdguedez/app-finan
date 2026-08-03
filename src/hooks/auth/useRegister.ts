@@ -28,7 +28,11 @@ const useRegister = ({ setUser }: any) => {
           lastName,
           password,
         });
+<<<<<<< Updated upstream
         console.log(response);
+=======
+        await saveSession(response.accessToken, response.userId, response.user);
+>>>>>>> Stashed changes
       } catch (error) {
         alert("Error al registrar usuario");
       } finally {
