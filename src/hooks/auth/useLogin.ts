@@ -12,6 +12,11 @@ const useLogin = ({ setUser }: { setUser: any }) => {
   });
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+<<<<<<< Updated upstream
+=======
+  const { biometricToken, userId, saveSession, saveBiometricToken } =
+    useSecureStore();
+>>>>>>> Stashed changes
 
   useEffect(() => {
     (async () => {
@@ -38,19 +43,35 @@ const useLogin = ({ setUser }: { setUser: any }) => {
       if (result.success) {
         setIsLoading(true);
         try {
+<<<<<<< Updated upstream
           const biometricToken =
             await SecureStore.getItemAsync("biometricToken");
           console.log({ biometricToken });
           if (!biometricToken) {
+=======
+          if (!biometricToken || !userId) {
+>>>>>>> Stashed changes
             return Alert.alert(
               "Registro biométrico pendiente",
               "Por favor, inicia sesión con tu correo y contraseña primero para activar el acceso rápido.",
             );
           }
 
+<<<<<<< Updated upstream
           const response = await authService.biometricLogin({ biometricToken });
           await SecureStore.setItemAsync("accessToken", response.accessToken);
           setUser(response);
+=======
+          const response = await authService.biometricLogin({
+            biometricToken,
+            userId,
+          });
+          await saveSession(
+            response.accessToken,
+            response.userId,
+            response.user,
+          );
+>>>>>>> Stashed changes
         } catch (err: any) {
           Alert.alert(
             "Error de biometría",
@@ -81,7 +102,11 @@ const useLogin = ({ setUser }: { setUser: any }) => {
         password: credentials.password,
       });
 
+<<<<<<< Updated upstream
       await SecureStore.setItemAsync("accessToken", accessToken);
+=======
+      await saveSession(response.accessToken, response.userId, response.user);
+>>>>>>> Stashed changes
 
       if (isBiometricSupported) {
         const deviceBiometricToken =

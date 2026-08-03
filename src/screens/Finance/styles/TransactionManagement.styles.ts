@@ -1,40 +1,6 @@
 import { StyleSheet } from "react-native";
 
-const StylesCategoryManagement = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0F172A",
-  },
-  background: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 60,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  backButton: {
-    padding: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 12,
-    marginRight: 15,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#F8FAFC",
-  },
-
-  // Form
+export const StylesTransactionManagement = StyleSheet.create({
   formContainer: {
     backgroundColor: "rgba(30, 41, 59, 0.7)",
     padding: 20,
@@ -61,29 +27,27 @@ const StylesCategoryManagement = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
   },
-
-  // Color Picker
-  colorGrid: {
+  pickerContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginBottom: 10,
   },
-  colorOption: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    marginBottom: 15,
-    justifyContent: "center",
+  typeButton: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "transparent",
+    marginHorizontal: 5,
   },
-  selectedColor: {
+  typeButtonActive: {
     borderColor: "#F8FAFC",
   },
-
-  // Button
+  typeButtonText: {
+    color: "#F8FAFC",
+    fontWeight: "600",
+  },
   addButton: {
     borderRadius: 12,
     overflow: "hidden",
@@ -98,18 +62,13 @@ const StylesCategoryManagement = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-
-  // List
   listTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#F8FAFC",
     marginBottom: 15,
   },
-  categoryList: {
-    flex: 1,
-  },
-  categoryItem: {
+  transactionItem: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(30, 41, 59, 0.7)",
@@ -119,21 +78,35 @@ const StylesCategoryManagement = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.05)",
   },
-  categoryColorDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+  transactionIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 15,
   },
-  categoryName: {
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionName: {
     fontSize: 16,
     fontWeight: "600",
     color: "#F8FAFC",
-    flex: 1,
+    marginBottom: 4,
   },
-  deleteButton: {
-    padding: 5,
+  transactionCategory: {
+    fontSize: 13,
+    color: "#94A3B8",
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  amountPositive: {
+    color: "#10B981",
+  },
+  amountNegative: {
+    color: "#F8FAFC",
   },
 });
-
-export { StylesCategoryManagement };
