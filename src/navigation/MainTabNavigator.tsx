@@ -9,7 +9,7 @@ import TransactionManagementScreen from "../screens/Finance/TransactionManagemen
 
 const Tab = createBottomTabNavigator();
 
-const MainTabNavigator = () => {
+const MainTabNavigator = ({ user, onLogout }: any) => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -46,7 +46,9 @@ const MainTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen name="Inicio" component={HomeScreen} />
+      <Tab.Screen name="Inicio">
+        {(props) => <HomeScreen {...props} user={user} onLogout={onLogout} />}
+      </Tab.Screen>
       <Tab.Screen
         name="Transacciones"
         component={TransactionManagementScreen}
