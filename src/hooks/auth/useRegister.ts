@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as SecureStore from "expo-secure-store";
 import { authService, RegisterPayload } from "../../services/authService";
 
 const useRegister = ({ setUser }: any) => {
@@ -28,11 +29,7 @@ const useRegister = ({ setUser }: any) => {
           lastName,
           password,
         });
-<<<<<<< Updated upstream
-        console.log(response);
-=======
-        await saveSession(response.accessToken, response.userId, response.user);
->>>>>>> Stashed changes
+        await SecureStore.setItemAsync("accessToken", response.accessToken);
       } catch (error) {
         alert("Error al registrar usuario");
       } finally {

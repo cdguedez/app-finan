@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Modal,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
@@ -13,15 +14,15 @@ import { StylesHomeScreen } from "./Auth/styles/HomeScreen.styles";
 import { financeService, DashboardData } from "../services/financeService";
 import { accountService } from "../services/accountService";
 import { HomeSkeleton } from "../components/Skeleton/HomeSkeleton";
-<<<<<<< Updated upstream
-=======
+import { Currency } from "../interfaces/Currency";
 import { useSecureStore } from "../context/SecureStoreContext";
 import { BaseScreen } from "../components/Layout/BaseScreen";
->>>>>>> Stashed changes
 
 const HomeScreen = ({ navigation, user, onLogout }: any) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
+  const [isCurrencyModalVisible, setCurrencyModalVisible] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState(user?.user?.baseCurrency || "USD");
 
   useEffect(() => {
     loadData();
@@ -63,15 +64,23 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
           <Text style={StylesHomeScreen.welcomeText}>Panel Financiero</Text>
           <Text style={StylesHomeScreen.userNameText}>
             Hola,{" "}
-            {`${userProfile?.firstName ?? ""} ${userProfile?.lastName ?? ""}`}
+            {`${user?.user?.firstName ?? user?.firstName ?? ""} ${user?.user?.lastName ?? user?.lastName ?? ""}`}
           </Text>
         </View>
-        <TouchableOpacity
-          style={StylesHomeScreen.logoutIcon}
-          onPress={onLogout}
-        >
-          <Ionicons name="log-out-outline" size={24} color="#F8FAFC" />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={[StylesHomeScreen.logoutIcon, { marginRight: 15 }]}
+            onPress={() => setCurrencyModalVisible(true)}
+          >
+            <Ionicons name="settings-outline" size={24} color="#F8FAFC" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={StylesHomeScreen.logoutIcon}
+            onPress={onLogout}
+          >
+            <Ionicons name="log-out-outline" size={24} color="#F8FAFC" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Balance Card */}
@@ -81,28 +90,8 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
         end={{ x: 1, y: 1 }}
         style={StylesHomeScreen.balanceCard}
       >
-<<<<<<< Updated upstream
-        <SafeAreaView style={StylesHomeScreen.content}>
-          {/* Header */}
-          <View style={StylesHomeScreen.header}>
-            <View style={StylesHomeScreen.headerLeft}>
-              <Text style={StylesHomeScreen.welcomeText}>Panel Financiero</Text>
-              <Text style={StylesHomeScreen.userNameText}>
-                Hola, {`${user?.user?.firstName} ${user?.user?.lastName}`}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={StylesHomeScreen.logoutIcon}
-              onPress={onLogout}
-            >
-              <Ionicons name="log-out-outline" size={24} color="#F8FAFC" />
-            </TouchableOpacity>
-          </View>
-=======
         <Text style={StylesHomeScreen.balanceLabel}>Saldo Total</Text>
         <Text style={StylesHomeScreen.balanceAmount}>{data?.balance}</Text>
->>>>>>> Stashed changes
-
         <View style={StylesHomeScreen.balanceFooter}>
           <View style={StylesHomeScreen.balanceFooterItem}>
             <Ionicons name="arrow-up-circle" size={20} color="#10B981" />
@@ -142,6 +131,39 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
           <Text style={StylesHomeScreen.statLabel}>Gastos</Text>
           <Text style={StylesHomeScreen.statValue}>{data?.expenses}</Text>
         </View>
+      </View>
+
+      {/* Quick Actions Grid */}
+      <View style={StylesHomeScreen.statsGrid}>
+        <TouchableOpacity
+          style={StylesHomeScreen.statCard}
+          onPress={() => navigation.navigate("Budgets")}
+        >
+          <View
+            style={[
+              StylesHomeScreen.statIcon,
+              { backgroundColor: "rgba(139, 92, 246, 0.15)" },
+            ]}
+          >
+            <Ionicons name="pie-chart" size={20} color="#8B5CF6" />
+          </View>
+          <Text style={StylesHomeScreen.statLabel}>Presupuestos</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={StylesHomeScreen.statCard}
+          onPress={() => navigation.navigate("Subscriptions")}
+        >
+          <View
+            style={[
+              StylesHomeScreen.statIcon,
+              { backgroundColor: "rgba(239, 68, 68, 0.15)" },
+            ]}
+          >
+            <Ionicons name="calendar" size={20} color="#EF4444" />
+          </View>
+          <Text style={StylesHomeScreen.statLabel}>Suscripciones</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Recent Transactions Section Header */}
@@ -191,6 +213,50 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
           </View>
         ))}
       </View>
+
+      {/* Currency Modal */}
+      <Modal
+        visible={isCurrencyModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setCurrencyModalVisible(false)}
+      >
+        <View style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <View style={{ backgroundColor: "#1E293B", padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>Moneda Principal</Text>
+              <TouchableOpacity onPress={() => setCurrencyModalVisible(false)}>
+                <Ionicons name="close" size={24} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+            
+            {Object.values(Currency).map((currency) => (
+              <TouchableOpacity
+                key={currency}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: 15,
+                  borderRadius: 10,
+                  backgroundColor: selectedCurrency === currency ? "rgba(59, 130, 246, 0.2)" : "transparent",
+                  marginBottom: 10,
+                }}
+                onPress={async () => {
+                  setSelectedCurrency(currency);
+                  setCurrencyModalVisible(false);
+                  // TODO: Call API to update baseCurrency in the backend
+                }}
+              >
+                <Text style={{ color: selectedCurrency === currency ? "#60A5FA" : "white", fontSize: 16 }}>
+                  {currency}
+                </Text>
+                {selectedCurrency === currency && <Ionicons name="checkmark" size={20} color="#60A5FA" />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
     </BaseScreen>
   );
 };
