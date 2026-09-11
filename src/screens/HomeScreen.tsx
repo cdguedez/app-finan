@@ -1,32 +1,28 @@
-import React, { useEffect, useState } from "react";
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  Modal,
-} from "react-native";
+import React, { useCallback, useState } from "react";
+import { Text, View, TouchableOpacity, Modal } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { StylesHomeScreen } from "./Auth/styles/HomeScreen.styles";
 import { financeService, DashboardData } from "../services/financeService";
 import { accountService } from "../services/accountService";
 import { HomeSkeleton } from "../components/Skeleton/HomeSkeleton";
 import { Currency } from "../interfaces/Currency";
-import { useSecureStore } from "../context/SecureStoreContext";
 import { BaseScreen } from "../components/Layout/BaseScreen";
 
 const HomeScreen = ({ navigation, user, onLogout }: any) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [isCurrencyModalVisible, setCurrencyModalVisible] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState(user?.user?.baseCurrency || "USD");
+  const [selectedCurrency, setSelectedCurrency] = useState(
+    user?.user?.baseCurrency || "USD",
+  );
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, []),
+  );
 
   const loadData = async () => {
     setLoading(true);
@@ -221,15 +217,39 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
         animationType="slide"
         onRequestClose={() => setCurrencyModalVisible(false)}
       >
-        <View style={{ flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <View style={{ backgroundColor: "#1E293B", padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <Text style={{ color: "white", fontSize: 18, fontWeight: "bold" }}>Moneda Principal</Text>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#1E293B",
+              padding: 20,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 20,
+              }}
+            >
+              <Text
+                style={{ color: "white", fontSize: 18, fontWeight: "bold" }}
+              >
+                Moneda Principal
+              </Text>
               <TouchableOpacity onPress={() => setCurrencyModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#94A3B8" />
               </TouchableOpacity>
             </View>
-            
+
             {Object.values(Currency).map((currency) => (
               <TouchableOpacity
                 key={currency}
@@ -239,7 +259,10 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
                   alignItems: "center",
                   padding: 15,
                   borderRadius: 10,
-                  backgroundColor: selectedCurrency === currency ? "rgba(59, 130, 246, 0.2)" : "transparent",
+                  backgroundColor:
+                    selectedCurrency === currency
+                      ? "rgba(59, 130, 246, 0.2)"
+                      : "transparent",
                   marginBottom: 10,
                 }}
                 onPress={async () => {
@@ -248,10 +271,17 @@ const HomeScreen = ({ navigation, user, onLogout }: any) => {
                   // TODO: Call API to update baseCurrency in the backend
                 }}
               >
-                <Text style={{ color: selectedCurrency === currency ? "#60A5FA" : "white", fontSize: 16 }}>
+                <Text
+                  style={{
+                    color: selectedCurrency === currency ? "#60A5FA" : "white",
+                    fontSize: 16,
+                  }}
+                >
                   {currency}
                 </Text>
-                {selectedCurrency === currency && <Ionicons name="checkmark" size={20} color="#60A5FA" />}
+                {selectedCurrency === currency && (
+                  <Ionicons name="checkmark" size={20} color="#60A5FA" />
+                )}
               </TouchableOpacity>
             ))}
           </View>
