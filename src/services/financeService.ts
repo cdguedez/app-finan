@@ -1,13 +1,16 @@
-// Simulation of an API response delay
-const DELAY = 1000;
+import { apiRequest } from "./apiClient";
+import * as SecureStore from "expo-secure-store";
+import { accountService } from "./accountService";
 
 export interface Transaction {
-  id: number;
-  name: string;
-  category: string;
-  amount: string;
-  icon: string;
-  color: string;
+  id: string;
+  accountId: string;
+  categoryId?: string;
+  amount: number;
+  type: "INCOME" | "EXPENSE";
+  description?: string;
+  date: string;
+  category?: Category;
 }
 
 export interface Category {
@@ -20,113 +23,101 @@ export interface DashboardData {
   balance: string;
   income: string;
   expenses: string;
-  transactions: Transaction[];
+  transactions: any[];
 }
 
-const mockDashboardData: DashboardData = {
-  balance: "$12,450.80",
-  income: "$4,200.00",
-  expenses: "$2,150.40",
-  transactions: [
-    {
-      id: 1,
-      name: "Suscripción Netflix",
-      category: "Entretenimiento",
-      amount: "-$15.99",
-      icon: "play-circle",
-      color: "#E50914",
-    },
-    {
-      id: 2,
-      name: "Depósito Nómina",
-      category: "Salario",
-      amount: "+$2,100.00",
-      icon: "wallet",
-      color: "#10B981",
-    },
-    {
-      id: 3,
-      name: "Compra Supermercado",
-      category: "Alimentación",
-      amount: "-$84.50",
-      icon: "cart",
-      color: "#F59E0B",
-    },
-    {
-      id: 4,
-      name: "Gimnasio Mensual",
-      category: "Salud",
-      amount: "-$45.00",
-      icon: "fitness",
-      color: "#3B82F6",
-    },
-    {
-      id: 5,
-      name: "Uber",
-      category: "Transporte",
-      amount: "-$15.00",
-      icon: "car",
-      color: "#3B82F6",
-    },
-    {
-      id: 6,
-      name: "Spotify",
-      category: "Entretenimiento",
-      amount: "-$10.00",
-      icon: "musical-note",
-      color: "#EF4444",
-    },
-    {
-      id: 7,
-      name: "Uber",
-      category: "Transporte",
-      amount: "-$15.00",
-      icon: "car",
-      color: "#3B82F6",
-    },
-    {
-      id: 8,
-      name: "Spotify",
-      category: "Entretenimiento",
-      amount: "-$10.00",
-      icon: "musical-note",
-      color: "#EF4444",
-    },
-  ],
-};
-
-const mockCategories: Category[] = [
-  { id: "1", name: "Alimentación", color: "#F59E0B" },
-  { id: "2", name: "Salario", color: "#10B981" },
-  { id: "3", name: "Entretenimiento", color: "#EF4444" },
-];
-
 export const financeService = {
-  getDashboardData: async (): Promise<DashboardData> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockDashboardData);
-      }, DELAY);
-    });
-  },
-
   getCategories: async (): Promise<Category[]> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockCategories);
-      }, DELAY);
-    });
+    const token = await SecureStore.getItemAsync("accessToken");
+    return apiRequest<Category[]>("/categories", { token: token || undefined });
   },
 
   addCategory: async (category: Omit<Category, "id">): Promise<Category> => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newCategory = {
-          ...category,
-          id: Date.now().toString(),
-        };
-        resolve(newCategory);
-      }, DELAY);
+    const token = await SecureStore.getItemAsync("accessToken");
+    return apiRequest<Category>("/categories", {
+      method: "POST",
+      body: category,
+      token: token || undefined,
     });
+  },
+
+  deleteCategory: async (id: string): Promise<void> => {
+    const token = await SecureStore.getItemAsync("accessToken");
+    return apiRequest<void>(`/categories/${id}`, {
+      method: "DELETE",
+      token: token || undefined,
+    });
+  },
+
+  getTransactions: async (accountId?: string): Promise<Transaction[]> => {
+    const token = await SecureStore.getItemAsync("accessToken");
+    const path = accountId
+      ? `/transactions?accountId=${accountId}`
+      : "/transactions";
+    return apiRequest<Transaction[]>(path, { token: token || undefined });
+  },
+
+  addTransaction: async (
+    transaction: Omit<Transaction, "id" | "category">,
+  ): Promise<Transaction> => {
+    const token = await SecureStore.getItemAsync("accessToken");
+    // Ensure amount is passed as number string if API expects Decimal, but JS number is fine since we use Decimal on backend which handles numbers.
+    return apiRequest<Transaction>("/transactions", {
+      method: "POST",
+      body: transaction,
+      token: token || undefined,
+    });
+  },
+
+  getDashboardData: async (): Promise<DashboardData> => {
+    try {
+      const [accounts, transactions] = await Promise.all([
+        accountService.getAccounts(),
+        financeService.getTransactions(),
+      ]);
+
+      const totalBalance = accounts.reduce(
+        (acc, curr) => acc + Number(curr.balance),
+        0,
+      );
+
+      const thisMonth = new Date();
+      let income = 0;
+      let expenses = 0;
+
+      transactions.forEach((t) => {
+        const tDate = new Date(t.date);
+        if (
+          tDate.getMonth() === thisMonth.getMonth() &&
+          tDate.getFullYear() === thisMonth.getFullYear()
+        ) {
+          if (t.type === "INCOME") income += Number(t.amount);
+          else expenses += Number(t.amount);
+        }
+      });
+
+      const formattedTransactions = transactions.slice(0, 10).map((t) => ({
+        id: t.id,
+        name: t.description || (t.type === "INCOME" ? "Ingreso" : "Gasto"),
+        category: t.category?.name || "Sin Categoría",
+        amount:
+          t.type === "INCOME"
+            ? `+$${Number(t.amount).toFixed(2)}`
+            : `-$${Number(t.amount).toFixed(2)}`,
+        icon: t.type === "INCOME" ? "trending-up" : "cart", // fallback
+        color:
+          t.category?.color || (t.type === "INCOME" ? "#10B981" : "#EF4444"),
+      }));
+
+      return {
+        balance: `$${totalBalance.toFixed(2)}`,
+        income: `$${income.toFixed(2)}`,
+        expenses: `$${expenses.toFixed(2)}`,
+        transactions: formattedTransactions,
+      };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   },
 };

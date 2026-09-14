@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { StylesCategoryManagement } from "./styles/CategoryManagement.styles";
 import { financeService, Category } from "../../services/financeService";
 import Skeleton from "../../components/Skeleton/Skeleton";
+import { BaseScreen } from "../../components/Layout/BaseScreen";
 
 const COLORS = [
   "#3B82F6",
@@ -102,114 +103,97 @@ const CategoryManagementScreen = ({ navigation }: any) => {
   };
 
   return (
-    <View style={StylesCategoryManagement.container}>
-      <StatusBar style="light" />
-
-      <SafeAreaView style={StylesCategoryManagement.content}>
-        {/* Header */}
-        <View style={StylesCategoryManagement.header}>
-          <TouchableOpacity
-            style={StylesCategoryManagement.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#F8FAFC" />
-          </TouchableOpacity>
-          <Text style={StylesCategoryManagement.headerTitle}>Categorías</Text>
+    <BaseScreen title="Categorías" showBackButton>
+      {/* Add Category Form */}
+      <View style={StylesCategoryManagement.formContainer}>
+        <View style={StylesCategoryManagement.inputGroup}>
+          <Text style={StylesCategoryManagement.label}>
+            Nombre de la Categoría
+          </Text>
+          <TextInput
+            style={StylesCategoryManagement.input}
+            placeholder="Ej. Viajes, Regalos..."
+            placeholderTextColor="#64748B"
+            value={name}
+            onChangeText={setName}
+            editable={!isAdding}
+          />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Add Category Form */}
-          <View style={StylesCategoryManagement.formContainer}>
-            <View style={StylesCategoryManagement.inputGroup}>
-              <Text style={StylesCategoryManagement.label}>
-                Nombre de la Categoría
-              </Text>
-              <TextInput
-                style={StylesCategoryManagement.input}
-                placeholder="Ej. Viajes, Regalos..."
-                placeholderTextColor="#64748B"
-                value={name}
-                onChangeText={setName}
-                editable={!isAdding}
-              />
-            </View>
-
-            <View style={StylesCategoryManagement.inputGroup}>
-              <Text style={StylesCategoryManagement.label}>
-                Selecciona un Color
-              </Text>
-              <View style={StylesCategoryManagement.colorGrid}>
-                {COLORS.map((color) => (
-                  <TouchableOpacity
-                    key={color}
-                    style={[
-                      StylesCategoryManagement.colorOption,
-                      { backgroundColor: color },
-                      selectedColor === color &&
-                        StylesCategoryManagement.selectedColor,
-                    ]}
-                    onPress={() => setSelectedColor(color)}
-                    disabled={isAdding}
-                  >
-                    {selectedColor === color && (
-                      <Ionicons name="checkmark" size={24} color="#F8FAFC" />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                StylesCategoryManagement.addButton,
-                isAdding && { opacity: 0.7 },
-              ]}
-              onPress={handleAddCategory}
-              disabled={isAdding}
-            >
-              <LinearGradient
-                colors={["#3B82F6", "#2563EB"]}
-                style={StylesCategoryManagement.addButtonGradient}
+        <View style={StylesCategoryManagement.inputGroup}>
+          <Text style={StylesCategoryManagement.label}>
+            Selecciona un Color
+          </Text>
+          <View style={StylesCategoryManagement.colorGrid}>
+            {COLORS.map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  StylesCategoryManagement.colorOption,
+                  { backgroundColor: color },
+                  selectedColor === color &&
+                    StylesCategoryManagement.selectedColor,
+                ]}
+                onPress={() => setSelectedColor(color)}
+                disabled={isAdding}
               >
-                {isAdding ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={StylesCategoryManagement.addButtonText}>
-                    Agregar Categoría
-                  </Text>
+                {selectedColor === color && (
+                  <Ionicons name="checkmark" size={24} color="#F8FAFC" />
                 )}
-              </LinearGradient>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            StylesCategoryManagement.addButton,
+            isAdding && { opacity: 0.7 },
+          ]}
+          onPress={handleAddCategory}
+          disabled={isAdding}
+        >
+          <LinearGradient
+            colors={["#3B82F6", "#2563EB"]}
+            style={StylesCategoryManagement.addButtonGradient}
+          >
+            {isAdding ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={StylesCategoryManagement.addButtonText}>
+                Agregar Categoría
+              </Text>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+
+      {/* Categories List */}
+      <Text style={StylesCategoryManagement.listTitle}>Tus Categorías</Text>
+      {loading ? (
+        <CategorySkeleton />
+      ) : (
+        categories.map((item) => (
+          <View key={item.id} style={StylesCategoryManagement.categoryItem}>
+            <View
+              style={[
+                StylesCategoryManagement.categoryColorDot,
+                { backgroundColor: item.color },
+              ]}
+            />
+            <Text style={StylesCategoryManagement.categoryName}>
+              {item.name}
+            </Text>
+            <TouchableOpacity
+              style={StylesCategoryManagement.deleteButton}
+              onPress={() => handleDeleteCategory(item.id)}
+            >
+              <Ionicons name="trash-outline" size={20} color="#EF4444" />
             </TouchableOpacity>
           </View>
-
-          {/* Categories List */}
-          <Text style={StylesCategoryManagement.listTitle}>Tus Categorías</Text>
-          {loading ? (
-            <CategorySkeleton />
-          ) : (
-            categories.map((item) => (
-              <View key={item.id} style={StylesCategoryManagement.categoryItem}>
-                <View
-                  style={[
-                    StylesCategoryManagement.categoryColorDot,
-                    { backgroundColor: item.color },
-                  ]}
-                />
-                <Text style={StylesCategoryManagement.categoryName}>
-                  {item.name}
-                </Text>
-                <TouchableOpacity
-                  style={StylesCategoryManagement.deleteButton}
-                  onPress={() => handleDeleteCategory(item.id)}
-                >
-                  <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                </TouchableOpacity>
-              </View>
-            ))
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+        ))
+      )}
+    </BaseScreen>
   );
 };
 
