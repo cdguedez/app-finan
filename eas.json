@@ -5,11 +5,14 @@
   },
   "build": {
     "preview": {
+      "node": "22.14.0",
       "android": {
         "buildType": "apk"
       }
     },
-    "production": {}
+    "production": {
+      "node": "22.14.0"
+    }
   },
   "submit": {
     "production": {}

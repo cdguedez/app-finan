@@ -14,7 +14,7 @@ import { StylesRegisterScreen } from "./styles/RegisterScreen.styles";
 import { useRegister } from "../../hooks/auth/useRegister";
 
 const RegisterScreen = ({ navigation, setUser }: any) => {
-  const { register, onChangeRegister, handleRegister } = useRegister({
+  const { register, onChangeRegister, handleRegister, isLoadingRegister } = useRegister({
     setUser,
   });
 
@@ -107,7 +107,7 @@ const RegisterScreen = ({ navigation, setUser }: any) => {
             </View>
 
             <TouchableOpacity
-              style={StylesRegisterScreen.button}
+            style={[StylesRegisterScreen.button, isLoadingRegister && { opacity: 0.6 }]}
               onPress={handleRegister}
             >
               <LinearGradient
