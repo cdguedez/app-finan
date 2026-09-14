@@ -1,6 +1,6 @@
 import { useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { authService, RegisterPayload } from "../../services/authService";
+import { authService } from "../../services/authService";
 
 const useRegister = ({ setUser }: any) => {
   const [register, setRegister] = useState({
