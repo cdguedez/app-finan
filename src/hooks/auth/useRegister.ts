@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { authService, RegisterPayload } from "../../services/authService";
+import * as SecureStore from "expo-secure-store";
+import { authService } from "../../services/authService";
 
 const useRegister = ({ setUser }: any) => {
   const [register, setRegister] = useState({
@@ -28,7 +29,7 @@ const useRegister = ({ setUser }: any) => {
           lastName,
           password,
         });
-        console.log(response);
+        await SecureStore.setItemAsync("accessToken", response.accessToken);
       } catch (error) {
         alert("Error al registrar usuario");
       } finally {
